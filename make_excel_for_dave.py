@@ -32,9 +32,21 @@ stop = '2019:252'
 msid_means_dict = {}
 
 # fetch every MSID, populate a dataframe
+# you can also do this with MSIDset, like:
+#temps = fetch.MSIDset(msidlist, start, stop, stat='daily')
+
+
+print("Populating time column")
+msid_means_dict['Time'] = fetch.MSID(msidlist[0], start, stop, stat='daily').times
+
 for msid in msidlist:
-    fetched_msid = fetch.MSID(msid, start, stop)
-    msid_means_dict[msid] = fetched_msid.means
+    print("Fetching {}".format(msid))
+    fetch_result = fetch.MSID(msid, start, stop, stat='daily')
+    
+    msid_means_dict[msid] = fetch_result.means
+	
+# Convert to a Pandas dataframe
+dataframe = pd.DataFrame.from_dict(msid_means_dict)
 
-print(msid_means_dict)
-
+# Create Excel file
+dataframe.to_excel("hrc_temperatures_10yr.xlsx", index=False)
